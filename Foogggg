@@ -10,6 +10,8 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "CustomUI"
 screenGui.ResetOnSpawn = false
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.DisplayOrder = 9999
+ScreenGui.IgnoreGuiInset = true
 
 -- Coba masukkan ke CoreGui, jika gagal masukkan ke PlayerGui
 local success = pcall(function()
