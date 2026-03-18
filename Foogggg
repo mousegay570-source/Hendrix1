@@ -1,0 +1,898 @@
+-- Roblox Luau Script - Custom UI dengan tema hitam dan ungu + CoreGui
+-- UI dengan ukuran lebih kecil dan recommended scripts
+
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local CoreGui = game:GetService("CoreGui")
+
+-- Buat ScreenGui di CoreGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "CustomUI"
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Coba masukkan ke CoreGui, jika gagal masukkan ke PlayerGui
+local success = pcall(function()
+    screenGui.Parent = CoreGui
+end)
+
+if not success then
+    screenGui.Parent = playerGui
+end
+
+-- Frame utama (yang bisa digeser) - UKURAN LEBIH KECIL
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 500, 0, 350)
+mainFrame.Position = UDim2.new(0.5, -250, 0.5, -175)
+mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.ClipsDescendants = false
+mainFrame.Parent = screenGui
+
+-- Border ungu di sekitar UI
+local uiBorder = Instance.new("UIStroke")
+uiBorder.Color = Color3.fromRGB(138, 43, 226)
+uiBorder.Thickness = 3
+uiBorder.Parent = mainFrame
+
+-- Corner rounded
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 8)
+mainCorner.Parent = mainFrame
+
+-- Tombol X (Close) - diperbaiki agar terlihat
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -38, 0, 8)
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 18
+closeButton.ZIndex = 10
+closeButton.Parent = mainFrame
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = closeButton
+
+local closeStroke = Instance.new("UIStroke")
+closeStroke.Color = Color3.fromRGB(255, 100, 100)
+closeStroke.Thickness = 2
+closeStroke.Parent = closeButton
+
+-- Open Button (bulat dengan logo F dan border ungu) - UKURAN LEBIH KECIL
+local openButton = Instance.new("TextButton")
+openButton.Name = "OpenButton"
+openButton.Size = UDim2.new(0, 50, 0, 50)
+openButton.Position = UDim2.new(0, 15, 0, 15)
+openButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+openButton.Text = ""
+openButton.Visible = false
+openButton.Active = true
+openButton.Draggable = true
+openButton.ZIndex = 100
+openButton.Parent = screenGui
+
+-- Buat bulat
+local openCorner = Instance.new("UICorner")
+openCorner.CornerRadius = UDim.new(1, 0)
+openCorner.Parent = openButton
+
+-- Border ungu pada open button
+local openStroke = Instance.new("UIStroke")
+openStroke.Color = Color3.fromRGB(138, 43, 226)
+openStroke.Thickness = 3
+openStroke.Parent = openButton
+
+-- Logo F di dalam open button
+local fLabel = Instance.new("TextLabel")
+fLabel.Size = UDim2.new(1, 0, 1, 0)
+fLabel.BackgroundTransparency = 1
+fLabel.Text = "F"
+fLabel.TextColor3 = Color3.fromRGB(138, 43, 226)
+fLabel.Font = Enum.Font.GothamBold
+fLabel.TextSize = 28
+fLabel.Parent = openButton
+
+-- Sidebar (hitam)
+local sidebar = Instance.new("Frame")
+sidebar.Name = "Sidebar"
+sidebar.Size = UDim2.new(0, 100, 1, 0)
+sidebar.Position = UDim2.new(0, 0, 0, 0)
+sidebar.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+sidebar.BorderSizePixel = 0
+sidebar.Parent = mainFrame
+
+local sidebarCorner = Instance.new("UICorner")
+sidebarCorner.CornerRadius = UDim.new(0, 8)
+sidebarCorner.Parent = sidebar
+
+-- Content Frame (area konten)
+local contentFrame = Instance.new("Frame")
+contentFrame.Name = "ContentFrame"
+contentFrame.Size = UDim2.new(1, -100, 1, 0)
+contentFrame.Position = UDim2.new(0, 100, 0, 0)
+contentFrame.BackgroundTransparency = 1
+contentFrame.BorderSizePixel = 0
+contentFrame.Parent = mainFrame
+
+-- Fungsi untuk membuat tombol navigasi
+local function createNavButton(text, position)
+    local button = Instance.new("TextButton")
+    button.Name = text .. "Button"
+    button.Size = UDim2.new(0, 85, 0, 55)
+    button.Position = UDim2.new(0, 8, 0, 12 + (position * 62))
+    button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    button.Text = text
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 14
+    button.Parent = sidebar
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 6)
+    btnCorner.Parent = button
+    
+    local btnStroke = Instance.new("UIStroke")
+    btnStroke.Color = Color3.fromRGB(138, 43, 226)
+    btnStroke.Thickness = 2
+    btnStroke.Transparency = 0.5
+    btnStroke.Parent = button
+    
+    return button
+end
+
+-- Buat tombol navigasi
+local homeButton = createNavButton("Home", 0)
+local searchButton = createNavButton("Search", 1)
+local editorButton = createNavButton("Editor", 2)
+local soonButton = createNavButton("soon", 3)
+
+-- HOME PAGE
+local homePage = Instance.new("Frame")
+homePage.Name = "HomePage"
+homePage.Size = UDim2.new(1, 0, 1, 0)
+homePage.BackgroundTransparency = 1
+homePage.Visible = true
+homePage.Parent = contentFrame
+
+local homeTitle = Instance.new("TextLabel")
+homeTitle.Size = UDim2.new(1, -15, 0, 35)
+homeTitle.Position = UDim2.new(0, 8, 0, 10)
+homeTitle.BackgroundTransparency = 1
+homeTitle.Text = "Welcome, " .. player.Name
+homeTitle.TextColor3 = Color3.fromRGB(138, 43, 226)
+homeTitle.Font = Enum.Font.GothamBold
+homeTitle.TextSize = 20
+homeTitle.Parent = homePage
+
+-- Profile Picture Frame (lebih kecil)
+local profileFrame = Instance.new("Frame")
+profileFrame.Size = UDim2.new(0, 60, 0, 60)
+profileFrame.Position = UDim2.new(0, 15, 0, 50)
+profileFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+profileFrame.BorderSizePixel = 0
+profileFrame.Parent = homePage
+
+local profileCorner = Instance.new("UICorner")
+profileCorner.CornerRadius = UDim.new(1, 0)
+profileCorner.Parent = profileFrame
+
+local profileStroke = Instance.new("UIStroke")
+profileStroke.Color = Color3.fromRGB(138, 43, 226)
+profileStroke.Thickness = 2
+profileStroke.Parent = profileFrame
+
+-- Profile Image
+local profileImage = Instance.new("ImageLabel")
+profileImage.Size = UDim2.new(1, -4, 1, -4)
+profileImage.Position = UDim2.new(0, 2, 0, 2)
+profileImage.BackgroundTransparency = 1
+profileImage.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=150&height=150&format=png"
+profileImage.Parent = profileFrame
+
+local imageCorner = Instance.new("UICorner")
+imageCorner.CornerRadius = UDim.new(1, 0)
+imageCorner.Parent = profileImage
+
+-- Profile info (samping foto)
+local profileLabel = Instance.new("TextLabel")
+profileLabel.Size = UDim2.new(0, 300, 0, 25)
+profileLabel.Position = UDim2.new(0, 85, 0, 55)
+profileLabel.BackgroundTransparency = 1
+profileLabel.Text = "@" .. player.Name
+profileLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+profileLabel.Font = Enum.Font.Gotham
+profileLabel.TextSize = 14
+profileLabel.TextXAlignment = Enum.TextXAlignment.Left
+profileLabel.Parent = homePage
+
+-- User ID
+local userIdLabel = Instance.new("TextLabel")
+userIdLabel.Size = UDim2.new(0, 300, 0, 20)
+userIdLabel.Position = UDim2.new(0, 85, 0, 80)
+userIdLabel.BackgroundTransparency = 1
+userIdLabel.Text = "User ID: " .. player.UserId
+userIdLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+userIdLabel.Font = Enum.Font.Gotham
+userIdLabel.TextSize = 11
+userIdLabel.TextXAlignment = Enum.TextXAlignment.Left
+userIdLabel.Parent = homePage
+
+-- Recommended Scripts Section
+local recommendedLabel = Instance.new("TextLabel")
+recommendedLabel.Size = UDim2.new(1, -15, 0, 25)
+recommendedLabel.Position = UDim2.new(0, 8, 0, 120)
+recommendedLabel.BackgroundTransparency = 1
+recommendedLabel.Text = "Recommended Scripts:"
+recommendedLabel.TextColor3 = Color3.fromRGB(138, 43, 226)
+recommendedLabel.Font = Enum.Font.GothamBold
+recommendedLabel.TextSize = 16
+recommendedLabel.TextXAlignment = Enum.TextXAlignment.Left
+recommendedLabel.Parent = homePage
+
+-- Recommended Scripts Container
+local recommendedScroll = Instance.new("ScrollingFrame")
+recommendedScroll.Size = UDim2.new(1, -15, 0, 145)
+recommendedScroll.Position = UDim2.new(0, 8, 0, 150)
+recommendedScroll.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+recommendedScroll.ScrollBarThickness = 4
+recommendedScroll.ScrollBarImageColor3 = Color3.fromRGB(138, 43, 226)
+recommendedScroll.BorderSizePixel = 0
+recommendedScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+recommendedScroll.Parent = homePage
+
+local recommendedCorner = Instance.new("UICorner")
+recommendedCorner.CornerRadius = UDim.new(0, 6)
+recommendedCorner.Parent = recommendedScroll
+
+local recommendedStroke = Instance.new("UIStroke")
+recommendedStroke.Color = Color3.fromRGB(138, 43, 226)
+recommendedStroke.Thickness = 2
+recommendedStroke.Parent = recommendedScroll
+
+local recommendedLayout = Instance.new("UIListLayout")
+recommendedLayout.Padding = UDim.new(0, 5)
+recommendedLayout.Parent = recommendedScroll
+
+local recommendedPadding = Instance.new("UIPadding")
+recommendedPadding.PaddingTop = UDim.new(0, 5)
+recommendedPadding.PaddingLeft = UDim.new(0, 5)
+recommendedPadding.PaddingRight = UDim.new(0, 5)
+recommendedPadding.PaddingBottom = UDim.new(0, 5)
+recommendedPadding.Parent = recommendedScroll
+
+-- Recommended Scripts Data
+local recommendedScripts = {
+    {
+        name = "Infinite Yield",
+        description = "Admin Commands",
+        script = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()' 
+    },
+    {
+        name = "Dark Dex",
+        description = "Game Explorer",
+        script = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/BypassedDarkDexV3.lua"))()' 
+    },
+    {
+        name = "Unnamed ESP",
+        description = "Player ESP",
+        script = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/ic3w0lf22/Unnamed-ESP/master/UnnamedESP.lua"))()' 
+    },
+    {
+        name = "Remote Spy",
+        description = "Remote Tracker",
+        script = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/exxtremestuffs/SimpleSpySource/master/SimpleSpy.lua"))()' 
+    }
+}
+
+-- Fungsi untuk membuat recommended script card
+local function createRecommendedCard(scriptData)
+    local card = Instance.new("Frame")
+    card.Size = UDim2.new(1, -8, 0, 60)
+    card.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    card.BorderSizePixel = 0
+    card.Parent = recommendedScroll
+    
+    local cardCorner = Instance.new("UICorner")
+    cardCorner.CornerRadius = UDim.new(0, 6)
+    cardCorner.Parent = card
+    
+    local cardStroke = Instance.new("UIStroke")
+    cardStroke.Color = Color3.fromRGB(138, 43, 226)
+    cardStroke.Thickness = 1
+    cardStroke.Transparency = 0.5
+    cardStroke.Parent = card
+    
+    local scriptName = Instance.new("TextLabel")
+    scriptName.Size = UDim2.new(1, -10, 0, 20)
+    scriptName.Position = UDim2.new(0, 5, 0, 5)
+    scriptName.BackgroundTransparency = 1
+    scriptName.Text = scriptData.name
+    scriptName.TextColor3 = Color3.fromRGB(138, 43, 226)
+    scriptName.Font = Enum.Font.GothamBold
+    scriptName.TextSize = 13
+    scriptName.TextXAlignment = Enum.TextXAlignment.Left
+    scriptName.Parent = card
+    
+    local scriptDesc = Instance.new("TextLabel")
+    scriptDesc.Size = UDim2.new(1, -10, 0, 18)
+    scriptDesc.Position = UDim2.new(0, 5, 0, 25)
+    scriptDesc.BackgroundTransparency = 1
+    scriptDesc.Text = scriptData.description
+    scriptDesc.TextColor3 = Color3.fromRGB(150, 150, 150)
+    scriptDesc.Font = Enum.Font.Gotham
+    scriptDesc.TextSize = 11
+    scriptDesc.TextXAlignment = Enum.TextXAlignment.Left
+    scriptDesc.Parent = card
+    
+    local exeBtn = Instance.new("TextButton")
+    exeBtn.Size = UDim2.new(0, 50, 0, 22)
+    exeBtn.Position = UDim2.new(1, -105, 0, 32)
+    exeBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+    exeBtn.Text = "Exe"
+    exeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    exeBtn.Font = Enum.Font.GothamBold
+    exeBtn.TextSize = 11
+    exeBtn.Parent = card
+    
+    local exeCorner = Instance.new("UICorner")
+    exeCorner.CornerRadius = UDim.new(0, 4)
+    exeCorner.Parent = exeBtn
+    
+    local copyBtn = Instance.new("TextButton")
+    copyBtn.Size = UDim2.new(0, 50, 0, 22)
+    copyBtn.Position = UDim2.new(1, -50, 0, 32)
+    copyBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    copyBtn.Text = "Copy"
+    copyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    copyBtn.Font = Enum.Font.GothamBold
+    copyBtn.TextSize = 11
+    copyBtn.Parent = card
+    
+    local copyCorner = Instance.new("UICorner")
+    copyCorner.CornerRadius = UDim.new(0, 4)
+    copyCorner.Parent = copyBtn
+    
+    -- Button functions
+    exeBtn.MouseButton1Click:Connect(function()
+        local success = pcall(function()
+            loadstring(scriptData.script)()
+        end)
+        
+        if success then
+            exeBtn.Text = "✓"
+            exeBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+            task.wait(1)
+            exeBtn.Text = "Exe"
+            exeBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+        else
+            exeBtn.Text = "✗"
+            exeBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+            task.wait(1)
+            exeBtn.Text = "Exe"
+            exeBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+        end
+    end)
+    
+    copyBtn.MouseButton1Click:Connect(function()
+        setclipboard(scriptData.script)
+        copyBtn.Text = "✓"
+        copyBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+        task.wait(1)
+        copyBtn.Text = "Copy"
+        copyBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    end)
+end
+
+-- Create recommended script cards
+for _, scriptData in ipairs(recommendedScripts) do
+    createRecommendedCard(scriptData)
+end
+
+recommendedScroll.CanvasSize = UDim2.new(0, 0, 0, recommendedLayout.AbsoluteContentSize.Y + 10)
+
+-- SEARCH PAGE
+local searchPage = Instance.new("Frame")
+searchPage.Name = "SearchPage"
+searchPage.Size = UDim2.new(1, 0, 1, 0)
+searchPage.BackgroundTransparency = 1
+searchPage.Visible = false
+searchPage.Parent = contentFrame
+
+local searchTitle = Instance.new("TextLabel")
+searchTitle.Size = UDim2.new(1, -15, 0, 30)
+searchTitle.Position = UDim2.new(0, 8, 0, 10)
+searchTitle.BackgroundTransparency = 1
+searchTitle.Text = "Search ScriptBlox"
+searchTitle.TextColor3 = Color3.fromRGB(138, 43, 226)
+searchTitle.Font = Enum.Font.GothamBold
+searchTitle.TextSize = 18
+searchTitle.Parent = searchPage
+
+-- Search Container
+local searchContainer = Instance.new("Frame")
+searchContainer.Size = UDim2.new(1, -15, 0, 38)
+searchContainer.Position = UDim2.new(0, 8, 0, 48)
+searchContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+searchContainer.BorderSizePixel = 0
+searchContainer.Parent = searchPage
+
+local searchContainerCorner = Instance.new("UICorner")
+searchContainerCorner.CornerRadius = UDim.new(0, 6)
+searchContainerCorner.Parent = searchContainer
+
+local searchContainerStroke = Instance.new("UIStroke")
+searchContainerStroke.Color = Color3.fromRGB(138, 43, 226)
+searchContainerStroke.Thickness = 2
+searchContainerStroke.Parent = searchContainer
+
+-- Search TextBox
+local searchBox = Instance.new("TextBox")
+searchBox.Size = UDim2.new(1, -80, 1, -8)
+searchBox.Position = UDim2.new(0, 8, 0, 4)
+searchBox.BackgroundTransparency = 1
+searchBox.PlaceholderText = "Enter script name or game..."
+searchBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 100)
+searchBox.Text = ""
+searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+searchBox.Font = Enum.Font.Gotham
+searchBox.TextSize = 12
+searchBox.TextXAlignment = Enum.TextXAlignment.Left
+searchBox.ClearTextOnFocus = false
+searchBox.Parent = searchContainer
+
+-- Search Button
+local searchSubmitBtn = Instance.new("TextButton")
+searchSubmitBtn.Size = UDim2.new(0, 65, 1, -8)
+searchSubmitBtn.Position = UDim2.new(1, -69, 0, 4)
+searchSubmitBtn.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+searchSubmitBtn.Text = "Search"
+searchSubmitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+searchSubmitBtn.Font = Enum.Font.GothamBold
+searchSubmitBtn.TextSize = 12
+searchSubmitBtn.Parent = searchContainer
+
+local searchBtnCorner = Instance.new("UICorner")
+searchBtnCorner.CornerRadius = UDim.new(0, 5)
+searchBtnCorner.Parent = searchSubmitBtn
+
+-- ScrollingFrame untuk hasil search
+local resultsScroll = Instance.new("ScrollingFrame")
+resultsScroll.Size = UDim2.new(1, -15, 0, 252)
+resultsScroll.Position = UDim2.new(0, 8, 0, 93)
+resultsScroll.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+resultsScroll.ScrollBarThickness = 4
+resultsScroll.ScrollBarImageColor3 = Color3.fromRGB(138, 43, 226)
+resultsScroll.BorderSizePixel = 0
+resultsScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+resultsScroll.Parent = searchPage
+
+local resultsCorner = Instance.new("UICorner")
+resultsCorner.CornerRadius = UDim.new(0, 6)
+resultsCorner.Parent = resultsScroll
+
+local resultsStroke = Instance.new("UIStroke")
+resultsStroke.Color = Color3.fromRGB(138, 43, 226)
+resultsStroke.Thickness = 2
+resultsStroke.Parent = resultsScroll
+
+local resultsLayout = Instance.new("UIListLayout")
+resultsLayout.Padding = UDim.new(0, 6)
+resultsLayout.Parent = resultsScroll
+
+local resultsPadding = Instance.new("UIPadding")
+resultsPadding.PaddingTop = UDim.new(0, 5)
+resultsPadding.PaddingLeft = UDim.new(0, 5)
+resultsPadding.PaddingRight = UDim.new(0, 5)
+resultsPadding.PaddingBottom = UDim.new(0, 5)
+resultsPadding.Parent = resultsScroll
+
+-- Fungsi search dari ScriptBlox
+local function searchScriptBlox(query)
+    -- Clear previous results
+    for _, child in pairs(resultsScroll:GetChildren()) do
+        if child:IsA("Frame") then
+            child:Destroy()
+        end
+    end
+    
+    local HttpService = game:GetService("HttpService")
+    local url = "https://scriptblox.com/api/script/search?q=" .. HttpService:UrlEncode(query)
+    
+    local success, response = pcall(function()
+        return game:HttpGet(url)
+    end)
+    
+    if success then
+        local decodeSuccess, data = pcall(function()
+            return HttpService:JSONDecode(response)
+        end)
+        
+        if decodeSuccess and data.result and data.result.scripts then
+            for i, script in pairs(data.result.scripts) do
+                if i > 12 then break end
+                
+                local scriptFrame = Instance.new("Frame")
+                scriptFrame.Size = UDim2.new(1, -8, 0, 70)
+                scriptFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+                scriptFrame.BorderSizePixel = 0
+                scriptFrame.Parent = resultsScroll
+                
+                local scriptCorner = Instance.new("UICorner")
+                scriptCorner.CornerRadius = UDim.new(0, 5)
+                scriptCorner.Parent = scriptFrame
+                
+                local scriptStroke = Instance.new("UIStroke")
+                scriptStroke.Color = Color3.fromRGB(138, 43, 226)
+                scriptStroke.Thickness = 1
+                scriptStroke.Transparency = 0.5
+                scriptStroke.Parent = scriptFrame
+                
+                local scriptName = Instance.new("TextLabel")
+                scriptName.Size = UDim2.new(1, -10, 0, 20)
+                scriptName.Position = UDim2.new(0, 5, 0, 5)
+                scriptName.BackgroundTransparency = 1
+                scriptName.Text = script.title or "Unnamed Script"
+                scriptName.TextColor3 = Color3.fromRGB(138, 43, 226)
+                scriptName.Font = Enum.Font.GothamBold
+                scriptName.TextSize = 12
+                scriptName.TextXAlignment = Enum.TextXAlignment.Left
+                scriptName.TextTruncate = Enum.TextTruncate.AtEnd
+                scriptName.Parent = scriptFrame
+                
+                local scriptGame = Instance.new("TextLabel")
+                scriptGame.Size = UDim2.new(1, -10, 0, 16)
+                scriptGame.Position = UDim2.new(0, 5, 0, 25)
+                scriptGame.BackgroundTransparency = 1
+                scriptGame.Text = "Game: " .. (script.game and script.game.name or "Universal")
+                scriptGame.TextColor3 = Color3.fromRGB(180, 180, 180)
+                scriptGame.Font = Enum.Font.Gotham
+                scriptGame.TextSize = 10
+                scriptGame.TextXAlignment = Enum.TextXAlignment.Left
+                scriptGame.Parent = scriptFrame
+                
+                -- Execute Button
+                local exeBtn = Instance.new("TextButton")
+                exeBtn.Size = UDim2.new(0, 55, 0, 24)
+                exeBtn.Position = UDim2.new(1, -125, 0, 42)
+                exeBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+                exeBtn.Text = "Execute"
+                exeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                exeBtn.Font = Enum.Font.GothamBold
+                exeBtn.TextSize = 10
+                exeBtn.Parent = scriptFrame
+                
+                local exeCorner = Instance.new("UICorner")
+                exeCorner.CornerRadius = UDim.new(0, 4)
+                exeCorner.Parent = exeBtn
+                
+                -- Copy Button
+                local copyBtn = Instance.new("TextButton")
+                copyBtn.Size = UDim2.new(0, 55, 0, 24)
+                copyBtn.Position = UDim2.new(1, -62, 0, 42)
+                copyBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+                copyBtn.Text = "Copy"
+                copyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                copyBtn.Font = Enum.Font.GothamBold
+                copyBtn.TextSize = 10
+                copyBtn.Parent = scriptFrame
+                
+                local copyCorner = Instance.new("UICorner")
+                copyCorner.CornerRadius = UDim.new(0, 4)
+                copyCorner.Parent = copyBtn
+                
+                -- Execute functionality
+                exeBtn.MouseButton1Click:Connect(function()
+                    local scriptContent = script.script or ""
+                    local execSuccess, execError = pcall(function()
+                        loadstring(scriptContent)()
+                    end)
+                    
+                    if execSuccess then
+                        exeBtn.Text = "✓ Done"
+                        exeBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+                        task.wait(1.5)
+                        exeBtn.Text = "Execute"
+                        exeBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+                    else
+                        exeBtn.Text = "✗ Error"
+                        exeBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+                        task.wait(1.5)
+                        exeBtn.Text = "Execute"
+                        exeBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+                    end
+                end)
+                
+                -- Copy functionality
+                copyBtn.MouseButton1Click:Connect(function()
+                    setclipboard(script.script or "")
+                    copyBtn.Text = "✓ Copied"
+                    copyBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+                    task.wait(1)
+                    copyBtn.Text = "Copy"
+                    copyBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+                end)
+            end
+            
+            resultsScroll.CanvasSize = UDim2.new(0, 0, 0, resultsLayout.AbsoluteContentSize.Y + 10)
+        else
+            local errorLabel = Instance.new("TextLabel")
+            errorLabel.Size = UDim2.new(1, 0, 0, 50)
+            errorLabel.BackgroundTransparency = 1
+            errorLabel.Text = "No results found"
+            errorLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+            errorLabel.Font = Enum.Font.GothamBold
+            errorLabel.TextSize = 14
+            errorLabel.Parent = resultsScroll
+        end
+    else
+        local errorLabel = Instance.new("TextLabel")
+        errorLabel.Size = UDim2.new(1, 0, 0, 50)
+        errorLabel.BackgroundTransparency = 1
+        errorLabel.Text = "Error: Could not fetch scripts"
+        errorLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        errorLabel.Font = Enum.Font.GothamBold
+        errorLabel.TextSize = 14
+        errorLabel.Parent = resultsScroll
+    end
+end
+
+-- Search functionality
+searchSubmitBtn.MouseButton1Click:Connect(function()
+    if searchBox.Text ~= "" then
+        searchScriptBlox(searchBox.Text)
+    end
+end)
+
+searchBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed and searchBox.Text ~= "" then
+        searchScriptBlox(searchBox.Text)
+    end
+end)
+
+-- EDITOR PAGE
+local editorPage = Instance.new("Frame")
+editorPage.Name = "EditorPage"
+editorPage.Size = UDim2.new(1, 0, 1, 0)
+editorPage.BackgroundTransparency = 1
+editorPage.Visible = false
+editorPage.Parent = contentFrame
+
+local editorTitle = Instance.new("TextLabel")
+editorTitle.Size = UDim2.new(1, -15, 0, 30)
+editorTitle.Position = UDim2.new(0, 8, 0, 10)
+editorTitle.BackgroundTransparency = 1
+editorTitle.Text = "Script Editor"
+editorTitle.TextColor3 = Color3.fromRGB(138, 43, 226)
+editorTitle.Font = Enum.Font.GothamBold
+editorTitle.TextSize = 18
+editorTitle.Parent = editorPage
+
+-- Editor TextBox Container
+local editorContainer = Instance.new("Frame")
+editorContainer.Size = UDim2.new(1, -15, 0, 260)
+editorContainer.Position = UDim2.new(0, 8, 0, 48)
+editorContainer.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+editorContainer.BorderSizePixel = 0
+editorContainer.Parent = editorPage
+
+local editorCorner = Instance.new("UICorner")
+editorCorner.CornerRadius = UDim.new(0, 6)
+editorCorner.Parent = editorContainer
+
+local editorStroke = Instance.new("UIStroke")
+editorStroke.Color = Color3.fromRGB(138, 43, 226)
+editorStroke.Thickness = 2
+editorStroke.Parent = editorContainer
+
+-- Script Editor TextBox
+local scriptEditor = Instance.new("TextBox")
+scriptEditor.Size = UDim2.new(1, -10, 1, -10)
+scriptEditor.Position = UDim2.new(0, 5, 0, 5)
+scriptEditor.BackgroundTransparency = 1
+scriptEditor.Text = 'print("hello everyone")'
+scriptEditor.PlaceholderText = ""
+scriptEditor.TextColor3 = Color3.fromRGB(255, 255, 255)
+scriptEditor.PlaceholderColor3 = Color3.fromRGB(100, 100, 100)
+scriptEditor.Font = Enum.Font.Code
+scriptEditor.TextSize = 12
+scriptEditor.TextXAlignment = Enum.TextXAlignment.Left
+scriptEditor.TextYAlignment = Enum.TextYAlignment.Top
+scriptEditor.MultiLine = true
+scriptEditor.ClearTextOnFocus = false
+scriptEditor.TextWrapped = true
+scriptEditor.Parent = editorContainer
+
+-- Hapus placeholder saat diklik pertama kali
+local firstClick = true
+scriptEditor.Focused:Connect(function()
+    if firstClick and scriptEditor.Text == 'print("hello everyone")' then
+        scriptEditor.Text = ""
+        firstClick = false
+    end
+end)
+
+-- Button Container
+local buttonContainer = Instance.new("Frame")
+buttonContainer.Size = UDim2.new(1, -15, 0, 32)
+buttonContainer.Position = UDim2.new(0, 8, 0, 313)
+buttonContainer.BackgroundTransparency = 1
+buttonContainer.Parent = editorPage
+
+-- Execute Button (Editor)
+local editorExeBtn = Instance.new("TextButton")
+editorExeBtn.Size = UDim2.new(0, 80, 0, 32)
+editorExeBtn.Position = UDim2.new(0, 0, 0, 0)
+editorExeBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+editorExeBtn.Text = "Execute"
+editorExeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+editorExeBtn.Font = Enum.Font.GothamBold
+editorExeBtn.TextSize = 12
+editorExeBtn.Parent = buttonContainer
+
+local editorExeCorner = Instance.new("UICorner")
+editorExeCorner.CornerRadius = UDim.new(0, 5)
+editorExeCorner.Parent = editorExeBtn
+
+local editorExeStroke = Instance.new("UIStroke")
+editorExeStroke.Color = Color3.fromRGB(0, 255, 0)
+editorExeStroke.Thickness = 2
+editorExeStroke.Parent = editorExeBtn
+
+-- Copy Button (Editor)
+local editorCopyBtn = Instance.new("TextButton")
+editorCopyBtn.Size = UDim2.new(0, 80, 0, 32)
+editorCopyBtn.Position = UDim2.new(0, 88, 0, 0)
+editorCopyBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+editorCopyBtn.Text = "Copy"
+editorCopyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+editorCopyBtn.Font = Enum.Font.GothamBold
+editorCopyBtn.TextSize = 12
+editorCopyBtn.Parent = buttonContainer
+
+local editorCopyCorner = Instance.new("UICorner")
+editorCopyCorner.CornerRadius = UDim.new(0, 5)
+editorCopyCorner.Parent = editorCopyBtn
+
+local editorCopyStroke = Instance.new("UIStroke")
+editorCopyStroke.Color = Color3.fromRGB(100, 200, 255)
+editorCopyStroke.Thickness = 2
+editorCopyStroke.Parent = editorCopyBtn
+
+-- Clear Button (Editor)
+local editorClearBtn = Instance.new("TextButton")
+editorClearBtn.Size = UDim2.new(0, 80, 0, 32)
+editorClearBtn.Position = UDim2.new(0, 176, 0, 0)
+editorClearBtn.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
+editorClearBtn.Text = "Clear"
+editorClearBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+editorClearBtn.Font = Enum.Font.GothamBold
+editorClearBtn.TextSize = 12
+editorClearBtn.Parent = buttonContainer
+
+local editorClearCorner = Instance.new("UICorner")
+editorClearCorner.CornerRadius = UDim.new(0, 5)
+editorClearCorner.Parent = editorClearBtn
+
+local editorClearStroke = Instance.new("UIStroke")
+editorClearStroke.Color = Color3.fromRGB(255, 100, 100)
+editorClearStroke.Thickness = 2
+editorClearStroke.Parent = editorClearBtn
+
+-- Editor Button Functions
+editorExeBtn.MouseButton1Click:Connect(function()
+    local code = scriptEditor.Text
+    if code ~= "" then
+        local success, err = pcall(function()
+            loadstring(code)()
+        end)
+        
+        if success then
+            editorExeBtn.Text = "✓ Success"
+            editorExeBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+            task.wait(1.5)
+            editorExeBtn.Text = "Execute"
+            editorExeBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+        else
+            editorExeBtn.Text = "✗ Error"
+            editorExeBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+            warn("Script Error:", err)
+            task.wait(1.5)
+            editorExeBtn.Text = "Execute"
+            editorExeBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+        end
+    end
+end)
+
+editorCopyBtn.MouseButton1Click:Connect(function()
+    if scriptEditor.Text ~= "" then
+        setclipboard(scriptEditor.Text)
+        editorCopyBtn.Text = "✓ Copied"
+        editorCopyBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+        task.wait(1)
+        editorCopyBtn.Text = "Copy"
+        editorCopyBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    end
+end)
+
+editorClearBtn.MouseButton1Click:Connect(function()
+    scriptEditor.Text = ""
+    editorClearBtn.Text = "✓ Cleared"
+    task.wait(0.8)
+    editorClearBtn.Text = "Clear"
+end)
+
+-- SOON PAGE
+local soonPage = Instance.new("Frame")
+soonPage.Name = "SoonPage"
+soonPage.Size = UDim2.new(1, 0, 1, 0)
+soonPage.BackgroundTransparency = 1
+soonPage.Visible = false
+soonPage.Parent = contentFrame
+
+local soonLabel = Instance.new("TextLabel")
+soonLabel.Size = UDim2.new(1, 0, 1, 0)
+soonLabel.BackgroundTransparency = 1
+soonLabel.Text = "Coming Soon..."
+soonLabel.TextColor3 = Color3.fromRGB(138, 43, 226)
+soonLabel.Font = Enum.Font.GothamBold
+soonLabel.TextSize = 28
+soonLabel.Parent = soonPage
+
+-- Navigation logic
+local function showPage(page)
+    homePage.Visible = false
+    searchPage.Visible = false
+    editorPage.Visible = false
+    soonPage.Visible = false
+    page.Visible = true
+end
+
+homeButton.MouseButton1Click:Connect(function()
+    showPage(homePage)
+end)
+
+searchButton.MouseButton1Click:Connect(function()
+    showPage(searchPage)
+end)
+
+editorButton.MouseButton1Click:Connect(function()
+    showPage(editorPage)
+end)
+
+soonButton.MouseButton1Click:Connect(function()
+    showPage(soonPage)
+end)
+
+-- Close/Open functionality
+closeButton.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    openButton.Visible = true
+end)
+
+openButton.MouseButton1Click:Connect(function()
+    mainFrame.Visible = true
+    openButton.Visible = false
+end)
+
+-- Animasi hover untuk tombol
+local function addHoverEffect(button, normalColor)
+    button.MouseEnter:Connect(function()
+        button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    end)
+    
+    button.MouseLeave:Connect(function()
+        button.BackgroundColor3 = normalColor
+    end)
+end
+
+addHoverEffect(homeButton, Color3.fromRGB(30, 30, 30))
+addHoverEffect(searchButton, Color3.fromRGB(30, 30, 30))
+addHoverEffect(editorButton, Color3.fromRGB(30, 30, 30))
+addHoverEffect(soonButton, Color3.fromRGB(30, 30, 30))
